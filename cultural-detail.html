@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>藏品详情 | 津派坞</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --color-white: #FFFFFF;
+      --color-tianjin-blue: #0071E3;
+      --color-haihe-gold: #FFD60A;
+      --color-dark: #1D1D1F;
+      --color-gray: #86868B;
+      --color-light-gray: #F5F5F7;
+      --transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+      --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.05);
+      --shadow-card-hover: 0 12px 40px rgba(0, 0, 0, 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--color-white);
+      color: var(--color-dark);
+      line-height: 1.47;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+      transition: var(--transition);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 48px;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 0 24px;
+      }
+    }
+
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      padding: 0 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .navbar-logo {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--color-dark);
+    }
+
+    .navbar-nav {
+      display: flex;
+      gap: 36px;
+    }
+
+    .navbar-nav a {
+      font-size: 14px;
+      color: var(--color-gray);
+      font-weight: 400;
+    }
+
+    .navbar-nav a:hover,
+    .navbar-nav a.active {
+      color: var(--color-dark);
+    }
+
+    .navbar-actions {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .navbar-actions svg {
+      width: 18px;
+      height: 18px;
+      color: var(--color-gray);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .navbar-actions svg:hover {
+      color: var(--color-dark);
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 24px;
+      background: var(--color-light-gray);
+      color: var(--color-dark);
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      transition: var(--transition);
+      margin-top: 80px;
+      margin-bottom: 20px;
+    }
+
+    .back-btn:hover {
+      background: #E8E8ED;
+    }
+
+    .back-btn svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .detail-section {
+      padding: 40px 0 100px;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: start;
+    }
+
+    @media (max-width: 968px) {
+      .detail-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+    }
+
+    .detail-image {
+      position: sticky;
+      top: 80px;
+    }
+
+    .detail-image img {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: cover;
+      border-radius: 20px;
+      background: var(--color-light-gray);
+    }
+
+    .detail-info h1 {
+      font-size: 32px;
+      font-weight: 500;
+      margin-bottom: 16px;
+      line-height: 1.2;
+    }
+
+    .detail-tag {
+      display: inline-block;
+      padding: 6px 14px;
+      background: var(--color-light-gray);
+      color: var(--color-gray);
+      font-size: 12px;
+      font-weight: 500;
+      border-radius: 20px;
+      margin-bottom: 24px;
+    }
+
+    .info-section {
+      margin-bottom: 32px;
+    }
+
+    .info-section-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--color-dark);
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--color-light-gray);
+    }
+
+    .info-table {
+      width: 100%;
+    }
+
+    .info-row {
+      display: flex;
+      padding: 10px 0;
+      border-bottom: 1px solid #F0F0F0;
+    }
+
+    .info-row:last-child {
+      border-bottom: none;
+    }
+
+    .info-label {
+      flex: 0 0 120px;
+      font-size: 14px;
+      color: var(--color-gray);
+    }
+
+    .info-value {
+      flex: 1;
+      font-size: 14px;
+      color: var(--color-dark);
+    }
+
+    .info-multi {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .info-multi-item {
+      font-size: 14px;
+      color: var(--color-dark);
+    }
+
+    .info-desc {
+      font-size: 14px;
+      color: var(--color-dark);
+      line-height: 1.7;
+    }
+
+    .info-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .info-tag {
+      padding: 4px 12px;
+      background: var(--color-light-gray);
+      color: var(--color-gray);
+      font-size: 12px;
+      border-radius: 6px;
+    }
+
+    .footer {
+      background: var(--color-light-gray);
+      padding: 48px 0;
+      margin-top: 60px;
+    }
+
+    .footer-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+    }
+
+    .footer-links a {
+      font-size: 13px;
+      color: var(--color-gray);
+    }
+
+    .footer-links a:hover {
+      color: var(--color-dark);
+    }
+
+    .footer-bottom {
+      font-size: 13px;
+      color: var(--color-gray);
+      display: flex;
+      gap: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .navbar {
+        padding: 0 24px;
+      }
+
+      .navbar-nav {
+        display: none;
+      }
+
+      .detail-section {
+        padding: 20px 0 60px;
+      }
+
+      .detail-info h1 {
+        font-size: 26px;
+      }
+
+      .info-label {
+        flex: 0 0 100px;
+      }
+
+      .footer-content {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .back-btn {
+        margin-top: 68px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="navbar">
+    <a href="cultural.html" class="navbar-logo">津派坞</a>
+    <ul class="navbar-nav">
+      <li><a href="index.html">首页</a></li>
+      <li><a href="cultural.html" class="active">文创数字藏品</a></li>
+      <li><a href="collection.html">津派馆藏</a></li>
+      <li><a href="news.html">资讯中心</a></li>
+      <li><a href="about.html">关于我们</a></li>
+    </ul>
+    <div class="navbar-actions">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      </svg>
+      <div class="menu-toggle"><span></span><span></span><span></span></div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <a href="cultural.html" class="back-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+      </svg>
+      返回列表
+    </a>
+  </div>
+
+  <section class="detail-section">
+    <div class="container">
+      <div class="detail-grid">
+        <div class="detail-image">
+          <img id="detailImage" src="" alt="藏品图片">
+        </div>
+        <div class="detail-info">
+          <h1 id="detailName">藏品名称</h1>
+          <span class="detail-tag" id="detailCategory">藏品品类</span>
+
+          <div class="info-section">
+            <h3 class="info-section-title">一、基础信息</h3>
+            <div class="info-table">
+              <div class="info-row">
+                <span class="info-label">藏品名称</span>
+                <span class="info-value" id="infoName">-</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">藏品编号</span>
+                <span class="info-value" id="infoCode">-</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">出品品牌</span>
+                <span class="info-value" id="infoBrand">-</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">发行时间</span>
+                <span class="info-value" id="infoDate">-</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">发行总量</span>
+                <span class="info-value" id="infoTotal">-</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">市场定价</span>
+                <span class="info-value" id="infoPrice">-</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">藏品品类</span>
+                <span class="info-value" id="infoCategory">-</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-section">
+            <h3 class="info-section-title">二、材质工艺</h3>
+            <div class="info-table">
+              <div class="info-row">
+                <span class="info-label">主体材质</span>
+                <span class="info-value" id="infoMaterial">-</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">制作工艺</span>
+                <span class="info-value" id="infoCraft">-</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">尺寸规格</span>
+                <span class="info-value" id="infoSize">-</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">配色版型</span>
+                <span class="info-value" id="infoColor">-</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-section">
+            <h3 class="info-section-title">三、文化内涵</h3>
+            <div class="info-table">
+              <div class="info-row">
+                <span class="info-label">设计灵感</span>
+                <span class="info-value" id="infoInspiration">-</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">历史典故</span>
+                <span class="info-value" id="infoHistory">-</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">图案含义</span>
+                <span class="info-value" id="infoPattern">-</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">主题故事</span>
+                <span class="info-value" id="infoStory">-</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-section">
+            <h3 class="info-section-title">四、设计亮点</h3>
+            <div class="info-desc" id="infoHighlights">-</div>
+          </div>
+
+          <div class="info-section">
+            <h3 class="info-section-title">五、收藏价值</h3>
+            <div class="info-desc" id="infoValue">-</div>
+          </div>
+
+          <div class="info-section">
+            <h3 class="info-section-title">六、配套权益</h3>
+            <div class="info-table">
+              <div class="info-row">
+                <span class="info-label">收藏证书</span>
+                <span class="info-value" id="infoCertificate">-</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">礼盒包装</span>
+                <span class="info-value" id="infoPackage">-</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">防伪标识</span>
+                <span class="info-value" id="infoAntiFake">-</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">养护说明</span>
+                <span class="info-value" id="infoCare">-</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-section">
+            <h3 class="info-section-title">七、适用场景</h3>
+            <div class="info-tags" id="infoScenes">-</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-links">
+          <a href="#">关于我们</a>
+          <a href="#">隐私政策</a>
+          <a href="#">使用条款</a>
+          <a href="#">联系客服</a>
+        </div>
+        <div class="footer-bottom">
+          <span>&copy; 2025 津派坞. 保留所有权利.</span>
+          <span>津ICP备xxxxxxxx号</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = urlParams.get('id') || '1';
+
+    const products = {
+      '1': {
+        name: '泥人张·钟馗嫁妹',
+        category: '非遗传承',
+        image: 'pictures/泥人张·钟馗嫁妹(1).jpg',
+        basic: {
+          name: '泥人张·钟馗嫁妹',
+          code: 'JPW-NRZ-001',
+          brand: '津派坞 × 泥人张工作室',
+          date: '2025年6月',
+          total: '限量 500 份',
+          price: '市场价 ¥299 首发价 ¥199',
+          category: '非遗传承 / 城市文旅'
+        },
+        material: {
+          material: '优质陶泥 + 天然矿物颜料',
+          craft: '手工捏制 + 彩绘上色',
+          size: '高约 18cm × 宽约 12cm',
+          color: '传统戏曲配色 / 立式摆件'
+        },
+        culture: {
+          inspiration: '源自天津泥人张世家经典作品《钟馗嫁妹》',
+          history: '钟馗嫁妹是流传已久的民间传说，体现了驱邪避灾、赐福送喜的美好寓意',
+          pattern: '钟馗身着大红官服，妹妹乘坐花轿，场面热闹喜庆',
+          story: '以泥人张世家百年技艺传承，再现这一经典题材，让传统艺术焕发新生'
+        },
+        highlights: '造型生动传神，服饰纹理精细入微，面部表情夸张却不失可爱。每一件作品均由泥人张传承人亲手制作，保留传统技法的同时融入现代审美。',
+        value: '泥人张作为天津非物质文化遗产代表性项目，具有极高的文化纪念意义和艺术鉴赏价值。此款数字藏品附赠同名实物复刻品，限量发行，稀缺属性明显。',
+        rights: {
+          certificate: '附赠收藏证书 + 独立编号',
+          package: '精品礼盒包装',
+          antiFake: 'NFC防伪芯片 + 二维码溯源',
+          care: '避免暴晒潮湿，可用软布轻拭'
+        },
+        scenes: ['居家陈设', '商务送礼', '文旅纪念', '藏品珍藏']
+      },
+      '2': {
+        name: '杨柳青年画·连年有余',
+        category: '城市文旅',
+        image: 'pictures/杨柳青年画·连年有余(1).jpg',
+        basic: {
+          name: '杨柳青年画·连年有余',
+          code: 'JPW-YLQ-001',
+          brand: '津派坞 × 杨柳青年画社',
+          date: '2025年5月',
+          total: '限量 800 份',
+          price: '市场价 ¥199 首发价 ¥129',
+          category: '城市文旅 / 国风'
+        },
+        material: {
+          material: '宣纸 + 传统木版水印',
+          craft: '木版年画手工印制',
+          size: '四开幅面（约 50×35cm）',
+          color: '传统杨柳青年画配色 / 喜庆红'
+        },
+        culture: {
+          inspiration: '源自杨柳青年画经典题材《连年有余》',
+          history: '杨柳青年画是天津国家级非物质文化遗产，以细腻的描绘和喜庆的风格著称',
+          pattern: '胖娃娃怀抱鲤鱼，寓意生活富足、年年有余',
+          story: '将传统年画元素与现代数字技术结合，让这门古老的民间艺术走进现代生活'
+        },
+        highlights: '线条流畅细腻，色彩明快艳丽，画面喜庆祥和。完美诠释了杨柳青年画"美女、娃娃、戏剧、仕女"的四大代表题材。',
+        value: '杨柳青年画承载着津门文化记忆，具有浓厚的地域特色和民俗价值。此款数字藏品可兑换同款实物年画，极具收藏意义。',
+        rights: {
+          certificate: '附赠收藏证书',
+          package: '筒装卷轴包装',
+          antiFake: '防伪水印 + 限量编号',
+          care: '避免折叠，注意防潮'
+        },
+        scenes: ['节日伴手礼', '居家陈设', '学生文创', '文旅纪念']
+      },
+      '3': {
+        name: '风筝魏·蝴蝶风筝',
+        category: '非遗传承',
+        image: 'pictures/风筝魏·蝴蝶风筝(1).jpg',
+        basic: {
+          name: '风筝魏·蝴蝶风筝',
+          code: 'JPW-FZW-001',
+          brand: '津派坞 × 风筝魏工作室',
+          date: '2025年4月',
+          total: '限量 300 份',
+          price: '市场价 ¥399 首发价 ¥259',
+          category: '非遗传承 / 节气'
+        },
+        material: {
+          material: '绢丝面料 + 竹篾骨架',
+          craft: '传统风筝手工绑扎',
+          size: '展开约 60×40cm',
+          color: '蝴蝶渐变配色 / 仿真丝绢'
+        },
+        culture: {
+          inspiration: '源自风筝魏第三代传人魏掌柜经典设计',
+          history: '风筝魏是天津风筝技艺的重要代表，以"造型多样、彩绘逼真、飞行平稳"著称',
+          pattern: '蝴蝶形态优美，翅膀纹理清晰，色彩过渡自然',
+          story: '将传统风筝艺术数字化，让这项非物质文化遗产在数字时代继续飞翔'
+        },
+        highlights: '风筝造型优美，展开面积大，飞行性能好。采用传统绢丝面料，配合精细的绑扎工艺，每只风筝都如同艺术品般精致。',
+        value: '风筝魏技艺是天津非遗文化的重要组成部分，具有深厚的文化底蕴和精湛的工艺价值。此款数字藏品可兑换同名实物风筝。',
+        rights: {
+          certificate: '附赠收藏证书 + 传承人亲签',
+          package: '专业风筝收纳筒',
+          antiFake: '传承人防伪落款',
+          care: '避免重压，飞行后注意晾干保存'
+        },
+        scenes: ['户外运动', '文旅纪念', '节日伴手礼', '藏品珍藏']
+      },
+      '4': {
+        name: '刻砖刘·福禄寿禧',
+        category: '非遗传承',
+        image: 'pictures/刻砖刘·福禄寿禧(1).jpg',
+        basic: {
+          name: '刻砖刘·福禄寿禧',
+          code: 'JPW-KZL-001',
+          brand: '津派坞 × 刻砖刘工坊',
+          date: '2025年3月',
+          total: '限量 400 份',
+          price: '市场价 ¥249 首发价 ¥169',
+          category: '非遗传承 / 历史IP'
+        },
+        material: {
+          material: '青砖 + 阴刻技法',
+          craft: '传统砖雕手工刻制',
+          size: '单砖约 24×12×4cm',
+          color: '青砖本色 / 四字组合'
+        },
+        culture: {
+          inspiration: '源自刻砖刘家族传统砖雕技艺',
+          history: '刻砖刘是天津传统建筑装饰艺术的重要流派，以精湛的雕刻技艺著称',
+          pattern: '福、禄、寿、禧四字，寓意人生四大喜事',
+          story: '将传统砖雕艺术凝练于方寸之间，展现天津建筑文化的独特魅力'
+        },
+        highlights: '字体端庄大气，笔画刚劲有力，构图饱满和谐。每一件砖雕都是纯手工雕刻，展现了匠人对传统技艺的坚守。',
+        value: '刻砖刘砖雕技艺是天津传统建筑文化的重要遗存，具有浓厚的历史文化价值和工艺美术价值。',
+        rights: {
+          certificate: '附赠收藏证书',
+          package: '锦盒包装 + 底座支架',
+          antiFake: '手工落款 + 收藏编号',
+          care: '避免碰撞，置于干燥处'
+        },
+        scenes: ['商务送礼', '居家陈设', '藏品珍藏', '文旅纪念']
+      },
+      '5': {
+        name: '卫砚·八角砚',
+        category: '国风',
+        image: 'pictures/卫砚·八角砚(1).jpg',
+        basic: {
+          name: '卫砚·八角砚',
+          code: 'JPW-WYY-001',
+          brand: '津派坞 × 卫砚阁',
+          date: '2025年2月',
+          total: '限量 200 份',
+          price: '市场价 ¥599 首发价 ¥399',
+          category: '国风 / 文房四宝'
+        },
+        material: {
+          material: '端砚石 + 精细打磨',
+          craft: '传统制砚工艺',
+          size: '八角形 直径约 20cm',
+          color: '端砚紫灰色 / 天然石眼'
+        },
+        culture: {
+          inspiration: '源自宋代卫夫人八角砚经典形制',
+          history: '卫夫人是晋代著名书法家，其创制的八角砚为历代文人追捧',
+          pattern: '八角形制，砚池开阔，砚堂平整',
+          story: '传承千年文房雅器，让书写成为一种艺术享受'
+        },
+        highlights: '造型古朴典雅，石质细腻温润，下墨发墨俱佳。天然石眼点缀其间，每一方都是独一无二的存在。',
+        value: '端砚为中国四大名砚之一，具有极高的实用价值和收藏价值。此款数字藏品可兑换同名实物端砚。',
+        rights: {
+          certificate: '附赠收藏证书 + 制砚师亲签',
+          package: '实木锦盒包装',
+          antiFake: 'NFC芯片溯源',
+          care: '避免阳光直射，定期以橄榄油养护'
+        },
+        scenes: ['书房陈设', '商务送礼', '藏品珍藏', '学生文创']
+      },
+      '6': {
+        name: '津派剪纸·窗花系列',
+        category: '非遗传承',
+        image: 'pictures/津派剪纸·窗花系列(1).jpg',
+        basic: {
+          name: '津派剪纸·窗花系列',
+          code: 'JPW-JZY-001',
+          brand: '津派坞 × 津派剪纸坊',
+          date: '2025年1月',
+          total: '限量 666 份',
+          price: '市场价 ¥99 首发价 ¥69',
+          category: '非遗传承 / 民俗'
+        },
+        material: {
+          material: '红色宣纸 + 激光剪刻',
+          craft: '剪纸技艺手工制作',
+          size: '单幅约 30×30cm',
+          color: '正红色 / 镂空图案'
+        },
+        culture: {
+          inspiration: '源自津派剪纸传承人经典窗花图样',
+          history: '津派剪纸以其精细的刀工和独特的构图风格著称，是北方剪纸艺术的代表',
+          pattern: '牡丹、蝴蝶、喜鹊等吉祥图案组合',
+          story: '以剪刀为笔，纸张为媒，剪出津门大地的生活百态'
+        },
+        highlights: '图案精美繁复，线条纤细如发，疏密关系处理得当。每一幅剪纸都蕴含着美好的寓意和祝福。',
+        value: '津派剪纸是天津非遗文化的重要组成，具有浓郁的民俗特色和审美价值。此款数字藏品可兑换同名实物剪纸套装。',
+        rights: {
+          certificate: '附赠收藏证书',
+          package: '纸筒包装',
+          antiFake: '设计师签名 + 收藏编号',
+          care: '避免潮湿，忌用力拉扯'
+        },
+        scenes: ['节日伴手礼', '居家陈设', '学生文创', '文旅纪念']
+      }
+    };
+
+    function loadProduct() {
+      const product = products[productId];
+      if (!product) {
+        window.location.href = 'cultural.html';
+        return;
+      }
+
+      document.getElementById('detailImage').src = product.image;
+      document.getElementById('detailName').textContent = product.name;
+      document.getElementById('detailCategory').textContent = product.category;
+
+      document.getElementById('infoName').textContent = product.basic.name;
+      document.getElementById('infoCode').textContent = product.basic.code;
+      document.getElementById('infoBrand').textContent = product.basic.brand;
+      document.getElementById('infoDate').textContent = product.basic.date;
+      document.getElementById('infoTotal').textContent = product.basic.total;
+      document.getElementById('infoPrice').textContent = product.basic.price;
+      document.getElementById('infoCategory').textContent = product.basic.category;
+
+      document.getElementById('infoMaterial').textContent = product.material.material;
+      document.getElementById('infoCraft').textContent = product.material.craft;
+      document.getElementById('infoSize').textContent = product.material.size;
+      document.getElementById('infoColor').textContent = product.material.color;
+
+      document.getElementById('infoInspiration').textContent = product.culture.inspiration;
+      document.getElementById('infoHistory').textContent = product.culture.history;
+      document.getElementById('infoPattern').textContent = product.culture.pattern;
+      document.getElementById('infoStory').textContent = product.culture.story;
+
+      document.getElementById('infoHighlights').textContent = product.highlights;
+      document.getElementById('infoValue').textContent = product.value;
+
+      document.getElementById('infoCertificate').textContent = product.rights.certificate;
+      document.getElementById('infoPackage').textContent = product.rights.package;
+      document.getElementById('infoAntiFake').textContent = product.rights.antiFake;
+      document.getElementById('infoCare').textContent = product.rights.care;
+
+      const scenesContainer = document.getElementById('infoScenes');
+      scenesContainer.innerHTML = '';
+      product.scenes.forEach(scene => {
+        const tag = document.createElement('span');
+        tag.className = 'info-tag';
+        tag.textContent = scene;
+        scenesContainer.appendChild(tag);
+      });
+
+      document.title = product.name + ' | 津派坞';
+    }
+
+    loadProduct();
+  </script>
+</body>
+
+</html>
